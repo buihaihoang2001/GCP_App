@@ -1,0 +1,81 @@
+- name: Setup Infra for DevOps Demo
+  hosts: local
+  vars_files:
+    - "{{ playbook_dir }}/../group_vars/all.yml"
+  tasks:
+    - name: Get GKE credentials
+      shell: >
+        gcloud container clusters get-credentials {{ gke_cluster_name }}
+        --zone {{ location }} --project {{ project_id }}
+
+    - name: Create namespace if not exists
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ k8s_namespace }}"
+
+    - name: Create StorageClass for Filestore
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: storage.k8s.io/v1
+          kind: StorageClass
+          metadata:
+            name: "{{ filestore_storage_class }}"
+          provisioner: kubernetes.io/no-provisioner
+          volumeBindingMode: WaitForFirstConsumer
+
+    - name: Create PersistentVolume
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: PersistentVolume
+          metadata:
+            name: filestore-pv
+          spec:
+            capacity:
+              storage: 1Ti
+            accessModes:
+              - ReadWriteMany
+            storageClassName: "{{ filestore_storage_class }}"
+            nfs:
+              path: "{{ filestore_path }}"
+              server: "{{ filestore_ip }}"
+            persistentVolumeReclaimPolicy: Retain
+
+    - name: Create PersistentVolumeClaim
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: filestore-pvc
+            namespace: "{{ k8s_namespace }}"
+          spec:
+            accessModes:
+              - ReadWriteMany
+            resources:
+              requests:
+                storage: 1Ti
+            storageClassName: "{{ filestore_storage_class }}"
+
+    - name: Create CloudSQL credentials Secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: cloudsql-credentials
+            namespace: "{{ k8s_namespace }}"
+          type: Opaque
+          stringData:
+            DB_HOST: "{{ cloudsql_private_ip }}"
+            DB_NAME: "{{ db_name }}"
+            DB_USER: "{{ db_user }}"
+            DB_PASSWORD: "{{ db_password }}"

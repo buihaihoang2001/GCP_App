@@ -1,0 +1,21 @@
+# GCP info
+project_id: devops-advance-477506
+region: us-central1
+location: us-central1-a
+
+# GKE info
+gke_cluster_name: devops-advance-dev-gke
+k8s_namespace: demo
+
+# Filestore info
+filestore_instance_name: devops-advance-dev-filestore
+filestore_ip: 10.149.117.210
+filestore_path: /default
+filestore_storage_class: filestore-sc
+
+# CloudSQL info
+cloudsql_instance_name: devops-advance-dev-postgres
+cloudsql_private_ip: 10.211.0.3
+db_name: numbersdb
+db_user: backenduser
+db_password: Hoangbh@2134
