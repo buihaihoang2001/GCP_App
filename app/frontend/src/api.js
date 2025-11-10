@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || "http://demo-backend.demo.svc.cluster.local:8000";
+const API_URL = process.env.REACT_APP_API_URL || "http://35.202.213.72:8000";
 
 export async function postNumber(value) {
   const res = await fetch(`${API_URL}/numbers`, {
