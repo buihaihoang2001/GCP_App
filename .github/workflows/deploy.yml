@@ -9,7 +9,7 @@ env:
   PROJECT_ID: devops-advance-477506
   REGION: us-central1
   REPO_NAME: devops-advance-dev-repo
-  CLUSTER_NAME: devops-advance-d
+  CLUSTER_NAME: devops-advance-dev-gke
   GKE_NAMESPACE: demo
 
 jobs:
