@@ -7,8 +7,8 @@ on:
 
 env:
   PROJECT_ID: devops-advance-477506
-  REGION: us-central1
-  CLUSTER_NAME: devops-advance-d
+  REGION: us-central1-a
+  CLUSTER_NAME: devops-advance-dev-gke
   REPO: devops-advance-dev-repo
   NAMESPACE: demo
 
