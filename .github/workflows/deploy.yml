@@ -55,6 +55,10 @@ jobs:
           gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} \
             --zone ${{ env.ZONE }} --project ${{ env.PROJECT_ID }}
 
+      - name: Install GKE auth plugin
+        run: |
+          sudo apt-get update && sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+
       - name: Deploy manifests
         run: |
           kubectl -n ${{ env.GKE_NAMESPACE }} apply -f app/backend/k8s/
