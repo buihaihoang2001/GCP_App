@@ -2,12 +2,12 @@ name: Build & Deploy to GKE
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 env:
   PROJECT_ID: devops-advance-477506
-  REGION: us-central1-a
+  AR_REGION: us-central1          # Artifact Registry region
+  GKE_ZONE: us-central1-a         # GKE zone
   CLUSTER_NAME: devops-advance-dev-gke
   REPO: devops-advance-dev-repo
   NAMESPACE: demo
@@ -15,46 +15,46 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 🔐 Auth GCP
-      - name: Set up Google Cloud auth
+      - name: Auth to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # 🔧 GCloud SDK
-      - name: Set up gcloud
+      - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
           install_components: gke-gcloud-auth-plugin
 
-      # 🚢 Get cluster credentials
+      - name: Docker login to Artifact Registry
+        run: |
+          gcloud auth configure-docker $AR_REGION-docker.pkg.dev --quiet
+          # hoặc cách khác (ổn định):
+          gcloud auth print-access-token | \
+            docker login -u oauth2accesstoken --password-stdin https://$AR_REGION-docker.pkg.dev
+
       - name: Get GKE credentials
         run: |
           gcloud container clusters get-credentials $CLUSTER_NAME \
-            --region $REGION --project $PROJECT_ID
+            --zone $GKE_ZONE --project $PROJECT_ID
 
-      # 🧱 Build & push backend
       - name: Build & Push Backend
         run: |
-          cd app/backend
-          docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-backend:latest .
-          gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
-          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-backend:latest
+          docker buildx create --use --name builder || true
+          docker buildx build --platform linux/amd64 \
+            -t $AR_REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-backend:latest \
+            ./app/backend --push
 
-      # 🧱 Build & push frontend
       - name: Build & Push Frontend
         run: |
-          cd app/frontend
-          docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-frontend:latest .
-          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-frontend:latest
+          docker buildx create --use --name builder || true
+          docker buildx build --platform linux/amd64 \
+            -t $AR_REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-frontend:latest \
+            ./app/frontend --push
 
-      # 🧩 Deploy manifests to GKE
       - name: Deploy to GKE
         run: |
           kubectl apply -n $NAMESPACE -f app/backend/k8s/
