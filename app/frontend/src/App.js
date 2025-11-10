@@ -10,7 +10,7 @@ function App() {
 
   const handleNumberSubmit = (e) => {
     e.preventDefault();
-    console.log("Gửi số:", number);
+    console.log("Send numer:", number);
     // Gọi API backend tại đây, ví dụ:
     // fetch(`${API_URL}/numbers`, { method: "POST", body: JSON.stringify({ number }) })
   };
