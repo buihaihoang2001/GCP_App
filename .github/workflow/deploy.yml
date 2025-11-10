@@ -1,0 +1,61 @@
+name: Build & Deploy to GKE
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: devops-advance-477506
+  REGION: us-central1
+  CLUSTER_NAME: devops-advance-d
+  REPO: devops-advance-dev-repo
+  NAMESPACE: demo
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 🔐 Auth GCP
+      - name: Set up Google Cloud auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # 🔧 GCloud SDK
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          install_components: gke-gcloud-auth-plugin
+
+      # 🚢 Get cluster credentials
+      - name: Get GKE credentials
+        run: |
+          gcloud container clusters get-credentials $CLUSTER_NAME \
+            --region $REGION --project $PROJECT_ID
+
+      # 🧱 Build & push backend
+      - name: Build & Push Backend
+        run: |
+          cd app/backend
+          docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-backend:latest .
+          gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
+          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-backend:latest
+
+      # 🧱 Build & push frontend
+      - name: Build & Push Frontend
+        run: |
+          cd app/frontend
+          docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-frontend:latest .
+          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REPO/demo-frontend:latest
+
+      # 🧩 Deploy manifests to GKE
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -n $NAMESPACE -f app/backend/k8s/
+          kubectl apply -n $NAMESPACE -f app/frontend/k8s/
