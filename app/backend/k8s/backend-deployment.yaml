@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-backend
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-backend
+  template:
+    metadata:
+      labels:
+        app: demo-backend
+    spec:
+      containers:
+        - name: demo-backend
+          # ⚠️ Image sẽ được CI/CD tự động thay bằng latest khi push
+          image: us-central1-docker.pkg.dev/devops-advance-477506/devops-advance-dev-repo/demo-backend:latest
+          imagePullPolicy: Always  # ⚠️ Bắt buộc để luôn lấy image mới nhất
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_HOST
+              value: "10.211.0.3"     # IP Private của CloudSQL
+            - name: DB_NAME
+              value: "numbersdb"
+            - name: DB_USER
+              value: "backenduser"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudsql-credentials
+                  key: db_password
+            - name: UPLOAD_DIR
+              value: "/data/uploads"
+          volumeMounts:
+            - name: filestore
+              mountPath: /data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: filestore
+          persistentVolumeClaim:
+            claimName: filestore-pvc
