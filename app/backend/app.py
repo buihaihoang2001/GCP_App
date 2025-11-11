@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import JSONResponse
 import os, psycopg2, uuid, shutil
+from fastapi import Body
 
 DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME", "postgres")
@@ -49,8 +50,12 @@ def health():
     return {"status": "ok"}
 
 @app.post("/numbers")
-def insert_number(value: int = Form(...)):
+def insert_number(value: int = Form(None), body: dict = Body(None)):
     try:
+        if body and "value" in body:
+            value = body["value"]
+        if value is None:
+            return JSONResponse(status_code=400, content={"error": "Missing value"})
         _id = str(uuid.uuid4())
         conn = db_conn(); cur = conn.cursor()
         cur.execute("INSERT INTO numbers(id, value) VALUES(%s, %s)", (_id, value))
