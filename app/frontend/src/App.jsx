@@ -198,107 +198,96 @@ function App() {
   // Đã xóa: useEffect thứ hai bị trùng lặp logic
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 p-4 md:p-10 font-sans">
-      
-      {/* --- Vùng Thông Báo --- */}
-      <Notification 
-        message={notification?.message} 
-        type={notification?.type} 
-        onClose={() => setNotification(null)}
-      />
+    <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-indigo-50 to-blue-100 p-6 md:p-12 font-sans">
+      <h1 className="text-5xl font-extrabold mb-10 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500 select-none">
+        🚀 Demo DevOps
+      </h1>
 
-      {/* --- Card Chính --- */}
-      <main className="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div className="md:grid md:grid-cols-2">
-
-          {/* === CỘT BÊN TRÁI: INPUTS === */}
-          <div className="p-8 md:p-12 border-r border-gray-100">
-            <h1 className="text-3xl md:text-4xl font-bold mb-8">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
-                🚀 Demo DevOps
-              </span>
-            </h1>
-
-            {/* --- Form Gửi Số --- */}
-            <form onSubmit={handleSubmitNumber} className="mb-10">
-              <label className="text-xl font-semibold text-gray-700 mb-4 block" htmlFor="number-input">
-                📊 Gửi dữ liệu số
-              </label>
-              <div className="flex space-x-2">
-                <input
-                  id="number-input"
-                  type="number"
-                  value={numberInput}
-                  onChange={(e) => setNumberInput(e.target.value)}
-                  placeholder="Nhập số của bạn..."
-                  className="flex-1 border border-gray-300 rounded-lg p-3 text-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  disabled={isLoading.number}
-                />
-                <button
-                  type="submit"
-                  className="bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition-all flex items-center justify-center w-14 h-14"
-                  disabled={isLoading.number}
-                >
-                  {isLoading.number ? <Spinner /> : <SendIcon className="w-6 h-6" />}
-                </button>
-              </div>
-            </form>
-
-            {/* --- Form Upload Ảnh --- */}
-            <form onSubmit={handleSubmitImage}>
-              <label className="text-xl font-semibold text-gray-700 mb-4 block" htmlFor="file-upload">
-                🖼️ Upload ảnh
-              </label>
-              
-              {/* Vùng kéo-thả */}
-              <label
-                htmlFor="file-upload"
-                className="flex flex-col items-center justify-center w-full h-40 border-2 border-indigo-300 border-dashed rounded-lg cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition-all"
-              >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <UploadIcon className="w-10 h-10 mb-3 text-indigo-500" />
-                  <p className="mb-2 text-sm text-gray-600">
-                    <span className="font-semibold">Bấm để chọn</span> hoặc kéo thả
-                  </p>
-                  <p className="text-xs text-gray-500">PNG, JPG, GIF (Tối đa 5MB)</p>
-                </div>
-                <input id="file-upload" type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
-              </label>
-
-              {/* Xem trước ảnh */}
-              {imagePreview && (
-                <div className="mt-4 text-center">
-                  <p className="font-semibold text-gray-600 mb-2">Xem trước:</p>
-                  <img
-                    src={imagePreview}
-                    alt="Xem trước"
-                    className="mx-auto rounded-lg shadow-md max-h-48"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{selectedFile?.name}</p>
-                </div>
-              )}
-
+      <main className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-10 flex flex-col space-y-10 border border-white">
+        {/* === FORM GỬI SỐ === */}
+        <section>
+          <form onSubmit={handleSubmitNumber} className="flex flex-col space-y-4">
+            <label className="text-xl font-semibold text-gray-700" htmlFor="number-input">
+              📊 Gửi dữ liệu số
+            </label>
+            <div className="flex space-x-3">
+              <input
+                id="number-input"
+                type="number"
+                value={numberInput}
+                onChange={(e) => setNumberInput(e.target.value)}
+                placeholder="Nhập số của bạn..."
+                className="flex-1 border border-gray-300 rounded-lg p-3 text-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                disabled={isLoading.number}
+              />
               <button
                 type="submit"
-                className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-all mt-4 flex items-center justify-center"
-                disabled={isLoading.image || !selectedFile}
+                className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white p-3 rounded-lg hover:brightness-110 transition-all flex items-center justify-center w-14 h-14"
+                disabled={isLoading.number}
               >
-                {isLoading.image ? <Spinner /> : 'Upload ảnh này'}
+                {isLoading.number ? <Spinner /> : <SendIcon className="w-6 h-6" />}
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
+        </section>
 
-          {/* === CỘT BÊN PHẢI: OUTPUTS === */}
-          <div className="p-8 md:p-12 bg-gray-50/70">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Bảng dữ liệu</h2>
+        {/* === FORM UPLOAD ẢNH === */}
+        <section>
+          <form onSubmit={handleSubmitImage} className="flex flex-col space-y-4">
+            <label className="text-xl font-semibold text-gray-700" htmlFor="file-upload">
+              🖼️ Upload ảnh
+            </label>
 
+            {/* Vùng kéo-thả */}
+            <label
+              htmlFor="file-upload"
+              className="flex flex-col items-center justify-center w-full h-40 border-2 border-indigo-300 border-dashed rounded-lg cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition-all"
+            >
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <UploadIcon className="w-10 h-10 mb-3 text-indigo-500" />
+                <p className="mb-2 text-sm text-gray-600">
+                  <span className="font-semibold">Bấm để chọn</span> hoặc kéo thả
+                </p>
+                <p className="text-xs text-gray-500">PNG, JPG, GIF (Tối đa 5MB)</p>
+              </div>
+              <input id="file-upload" type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+            </label>
+
+            {/* Xem trước ảnh */}
+            {imagePreview && (
+              <div className="mt-2 text-center">
+                <p className="font-semibold text-gray-600 mb-2">Xem trước:</p>
+                <img
+                  src={imagePreview}
+                  alt="Xem trước"
+                  className="mx-auto rounded-lg shadow-md max-h-36 max-w-36 object-contain rounded-xl border border-gray-300"
+                  style={{ borderRadius: '0.5rem' }}
+                />
+                <p className="text-xs text-gray-500 mt-1">{selectedFile?.name}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-indigo-600 to-blue-500 text-white font-semibold py-3 rounded-lg hover:brightness-110 transition-all flex items-center justify-center"
+              disabled={isLoading.image || !selectedFile}
+            >
+              {isLoading.image ? <Spinner /> : 'Upload ảnh này'}
+            </button>
+          </form>
+        </section>
+
+        {/* === BẢNG DỮ LIỆU === */}
+        <section>
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Bảng dữ liệu</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* --- Danh sách số --- */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center justify-center md:justify-start">
                 <DatabaseIcon className="w-5 h-5 mr-2 text-indigo-500" />
                 Số đã gửi
               </h3>
-              <div className="bg-white rounded-lg shadow-inner max-h-60 overflow-y-auto p-4 border">
+              <div className="bg-white rounded-lg shadow-inner max-h-60 overflow-y-auto p-4 border border-gray-200">
                 {isLoading.list && <p className="text-gray-500 text-center">Đang tải...</p>}
                 {!isLoading.list && numbersList.length === 0 && (
                   <p className="text-gray-500 text-center">Chưa có dữ liệu.</p>
@@ -318,11 +307,11 @@ function App() {
 
             {/* --- Danh sách ảnh --- */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center justify-center md:justify-start">
                 <ImageIcon className="w-5 h-5 mr-2 text-blue-500" />
                 Ảnh đã upload
               </h3>
-              <div className="bg-white rounded-lg shadow-inner max-h-80 overflow-y-auto p-4 border">
+              <div className="bg-white rounded-lg shadow-inner max-h-80 overflow-y-auto p-4 border border-gray-200">
                 {isLoading.list && <p className="text-gray-500 text-center">Đang tải...</p>}
                 {!isLoading.list && imagesList.length === 0 && (
                   <p className="text-gray-500 text-center">Chưa có ảnh nào.</p>
@@ -341,11 +330,9 @@ function App() {
                 </div>
               </div>
             </div>
-
           </div>
-        </div>
+        </section>
       </main>
-
     </div>
   );
 }
