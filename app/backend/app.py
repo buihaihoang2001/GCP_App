@@ -69,8 +69,8 @@ def insert_number(value: int = Form(...)):
         cur.close()
         conn.close()
 
-        message = f"✅ Số {value} đã được lưu vào bảng 'numbers' trong CloudSQL vào lúc {now.strftime('%H:%M:%S %d/%m/%Y')}."
-        print(message)
+        message = f"Số {value} đã được lưu vào bảng numbers trong CloudSQL vào ngày {now.strftime('%d/%m/%Y %H:%M:%S')}"
+        print(f"✅ {message}")
 
         return {
             "id": _id,
@@ -86,7 +86,7 @@ def insert_number(value: int = Form(...)):
 @app.post("/upload")
 def upload_image(file: UploadFile = File(...)):
     try:
-        fname = f"{uuid.uuid4()}_{file.filename}"
+        fname = file.filename
         dest = os.path.join(UPLOAD_DIR, fname)
         with open(dest, "wb") as f:
             shutil.copyfileobj(file.file, f)
@@ -103,12 +103,17 @@ def list_items():
         conn = db_conn()
         cur = conn.cursor()
         cur.execute("SELECT id, value, created_at FROM numbers ORDER BY created_at DESC;")
-        items = [{"id": i[0], "value": i[1], "created_at": i[2]} for i in cur.fetchall()]
+        rows = cur.fetchall()
+        items = []
+        for i in rows:
+            description = f"Số {i[1]} đã được lưu vào bảng numbers trong CloudSQL vào ngày {i[2].strftime('%d/%m/%Y %H:%M:%S')}"
+            items.append({"id": i[0], "value": i[1], "created_at": i[2], "description": description})
         cur.close()
         conn.close()
 
         files = os.listdir(UPLOAD_DIR)
-        return {"numbers": items, "images": files}
+        images = [{"filename": f, "url": f"/uploads/{f}"} for f in files]
+        return {"numbers": items, "images": images}
     except Exception as e:
         print("❌ List error:", e)
         return JSONResponse(status_code=500, content={"error": str(e)})

@@ -196,7 +196,9 @@ function App() {
             <ul className="space-y-1">
               {numbersList.map((item, index) => (
                 <li key={item.id || index} className="text-base">
-                  {item.value.toString().replace(/[:].*$/, '')} - {new Date(item.created_at).toLocaleDateString('vi-VN')}
+                  {item.description 
+                    ? item.description 
+                    : `Số ${item.value} - ${new Date(item.created_at).toLocaleDateString('vi-VN')}`}
                 </li>
               ))}
             </ul>
@@ -239,14 +241,16 @@ function App() {
           {!isLoading.list && imagesList.length > 0 && (
             <div className="grid grid-cols-3 gap-4">
               {imagesList.map((src, index) => (
-                <img
-                  key={index}
-                  src={src}
-                  alt={`Uploaded ${index}`}
-                  className="w-full h-24 object-contain rounded-md border border-gray-300 bg-gray-50"
-                  crossOrigin="anonymous"
-                  onError={(e) => e.target.src = 'https://placehold.co/100x100/F0F0F0/CCC?text=Error'}
-                />
+                <a key={index} href={src} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={src}
+                    alt={src.split('/').pop()}
+                    title="Bấm để mở ảnh thật"
+                    className="w-full h-24 object-contain rounded-md border border-gray-300 bg-gray-50 hover:scale-105 transition-transform"
+                    crossOrigin="anonymous"
+                    onError={(e) => e.target.src = 'https://placehold.co/100x100/F0F0F0/CCC?text=Error'}
+                  />
+                </a>
               ))}
             </div>
           )}
