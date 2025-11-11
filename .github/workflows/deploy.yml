@@ -28,6 +28,10 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
+          install_components: 'gke-gcloud-auth-plugin'
+
+      - name: Enable GKE gcloud auth plugin
+        run: echo "USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
 
       - name: Authenticate with Service Account
         run: |
