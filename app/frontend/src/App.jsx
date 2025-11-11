@@ -199,7 +199,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-indigo-50 to-blue-100 p-6 md:p-12 font-sans">
-      <h1 className="text-5xl font-extrabold mb-10 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500 select-none">
+      <h1 className="text-3xl font-extrabold mb-10 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500 select-none">
         🚀 Demo DevOps
       </h1>
 
@@ -225,7 +225,7 @@ function App() {
                 className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white p-3 rounded-lg hover:brightness-110 transition-all flex items-center justify-center w-14 h-14"
                 disabled={isLoading.number}
               >
-                {isLoading.number ? <Spinner /> : <SendIcon className="w-6 h-6" />}
+                {isLoading.number ? <Spinner /> : <SendIcon className="w-4 h-4" />}
               </button>
             </div>
           </form>
@@ -244,7 +244,7 @@ function App() {
               className="flex flex-col items-center justify-center w-full h-40 border-2 border-indigo-300 border-dashed rounded-lg cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition-all"
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <UploadIcon className="w-10 h-10 mb-3 text-indigo-500" />
+                <UploadIcon className="w-4 h-4 mb-3 text-indigo-500" />
                 <p className="mb-2 text-sm text-gray-600">
                   <span className="font-semibold">Bấm để chọn</span> hoặc kéo thả
                 </p>
@@ -282,12 +282,12 @@ function App() {
           <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Bảng dữ liệu</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* --- Danh sách số --- */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center justify-center md:justify-start">
-                <DatabaseIcon className="w-5 h-5 mr-2 text-indigo-500" />
+            <div className="flex flex-col items-center">
+              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center justify-center">
+                <DatabaseIcon className="w-4 h-4 mr-2 text-indigo-500" />
                 Số đã gửi
               </h3>
-              <div className="bg-white rounded-lg shadow-inner max-h-60 overflow-y-auto p-4 border border-gray-200">
+              <div className="bg-white rounded-lg shadow-inner max-h-60 overflow-y-auto p-4 border border-gray-200 w-full">
                 {isLoading.list && <p className="text-gray-500 text-center">Đang tải...</p>}
                 {!isLoading.list && numbersList.length === 0 && (
                   <p className="text-gray-500 text-center">Chưa có dữ liệu.</p>
@@ -295,9 +295,9 @@ function App() {
                 <ul className="divide-y divide-gray-100">
                   {numbersList.map((item, index) => (
                     <li key={item.id || index} className="py-3 flex justify-between items-center">
-                      <span className="text-lg font-medium text-gray-800">{item.value}</span>
+                      <span className="text-lg font-medium text-gray-800">{item.value.toString().replace(/[:].*$/, '')}</span>
                       <span className="text-xs text-gray-400">
-                        {new Date(item.created_at).toLocaleString('vi-VN')}
+                        {new Date(item.created_at).toLocaleDateString('vi-VN')}
                       </span>
                     </li>
                   ))}
@@ -306,15 +306,15 @@ function App() {
             </div>
 
             {/* --- Danh sách ảnh --- */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center justify-center md:justify-start">
-                <ImageIcon className="w-5 h-5 mr-2 text-blue-500" />
+            <div className="flex flex-col items-center">
+              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center justify-center">
+                <ImageIcon className="w-4 h-4 mr-2 text-blue-500" />
                 Ảnh đã upload
               </h3>
-              <div className="bg-white rounded-lg shadow-inner max-h-80 overflow-y-auto p-4 border border-gray-200">
+              <div className="bg-white rounded-lg shadow-inner max-h-80 overflow-y-auto p-4 border border-gray-200 w-full">
                 {isLoading.list && <p className="text-gray-500 text-center">Đang tải...</p>}
                 {!isLoading.list && imagesList.length === 0 && (
-                  <p className="text-gray-500 text-center">Chưa có ảnh nào.</p>
+                  <p className="text-gray-500 text-center">Chưa có ảnh nào được tải lên.</p>
                 )}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {imagesList.map((src, index) => (
@@ -322,7 +322,8 @@ function App() {
                       key={index}
                       src={src}
                       alt={`Uploaded ${index}`}
-                      className="w-full h-24 object-cover rounded-md shadow-sm"
+                      className="w-full h-32 object-contain rounded-lg border border-gray-200 bg-gray-50"
+                      crossOrigin="anonymous"
                       // Thêm fallback phòng trường hợp ảnh bị lỗi
                       onError={(e) => e.target.src = 'https://placehold.co/100x100/F0F0F0/CCC?text=Error'}
                     />
