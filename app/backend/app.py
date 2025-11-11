@@ -10,6 +10,16 @@ UPLOAD_DIR = os.getenv("UPLOAD_DIR", "/data/uploads")
 
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 def db_conn():
     return psycopg2.connect(
         host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD
