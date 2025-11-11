@@ -86,12 +86,18 @@ def insert_number(value: int = Form(...)):
 @app.post("/upload")
 def upload_image(file: UploadFile = File(...)):
     try:
-        fname = file.filename
-        dest = os.path.join(UPLOAD_DIR, fname)
+        import re
+        from urllib.parse import quote
+
+        # Làm sạch tên file để tránh lỗi khi truy cập
+        safe_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', file.filename)
+        dest = os.path.join(UPLOAD_DIR, safe_name)
+
         with open(dest, "wb") as f:
             shutil.copyfileobj(file.file, f)
-        print(f"✅ Uploaded file: {fname}")
-        return {"file": fname, "status": "uploaded"}
+
+        print(f"✅ Uploaded file: {safe_name}")
+        return {"file": safe_name, "url": f"/uploads/{quote(safe_name)}", "status": "uploaded"}
     except Exception as e:
         print("❌ Upload error:", e)
         return JSONResponse(status_code=500, content={"error": str(e)})
@@ -100,6 +106,7 @@ def upload_image(file: UploadFile = File(...)):
 @app.get("/list")
 def list_items():
     try:
+        from urllib.parse import quote
         conn = db_conn()
         cur = conn.cursor()
         cur.execute("SELECT id, value, created_at FROM numbers ORDER BY created_at DESC;")
@@ -112,7 +119,7 @@ def list_items():
         conn.close()
 
         files = os.listdir(UPLOAD_DIR)
-        images = [{"filename": f, "url": f"/uploads/{f}"} for f in files]
+        images = [{"filename": f, "url": f"/uploads/{quote(f)}"} for f in files]
         return {"numbers": items, "images": images}
     except Exception as e:
         print("❌ List error:", e)
