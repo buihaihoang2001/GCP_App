@@ -32,31 +32,26 @@ jobs:
         run: |
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      # Build & push BACKEND
       - name: Build and Push Backend
         run: |
           docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/demo-backend:latest ./app/backend
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/demo-backend:latest
 
-      # Build & push FRONTEND
       - name: Build and Push Frontend
         run: |
           docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/demo-frontend:latest ./app/frontend
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/demo-frontend:latest
 
-      # Connect to GKE cluster
       - name: Get GKE credentials
         run: |
           gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} \
             --zone ${{ env.ZONE }} --project ${{ env.PROJECT_ID }}
 
-      # Install GKE Auth Plugin
       - name: Install GKE auth plugin
         run: |
           sudo apt-get update
           sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin || true
 
-      # Apply manifests & restart deployments
       - name: Apply Kubernetes manifests
         run: |
           kubectl -n ${{ env.GKE_NAMESPACE }} apply -f app/backend/k8s/
