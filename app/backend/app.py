@@ -61,14 +61,23 @@ def insert_number(value: int = Form(...)):
     """Nhận value dạng form-urlencoded và lưu vào DB"""
     try:
         _id = str(uuid.uuid4())
+        now = datetime.now()
         conn = db_conn()
         cur = conn.cursor()
-        cur.execute("INSERT INTO numbers(id, value) VALUES(%s, %s)", (_id, value))
+        cur.execute("INSERT INTO numbers(id, value, created_at) VALUES(%s, %s, %s)", (_id, value, now))
         conn.commit()
         cur.close()
         conn.close()
-        print(f"✅ Inserted number {value}")
-        return {"id": _id, "value": value, "status": "saved"}
+
+        message = f"✅ Số {value} đã được lưu vào bảng 'numbers' trong CloudSQL vào lúc {now.strftime('%H:%M:%S %d/%m/%Y')}."
+        print(message)
+
+        return {
+            "id": _id,
+            "value": value,
+            "saved_at": now.isoformat(),
+            "message": message
+        }
     except Exception as e:
         print("❌ Insert error:", e)
         return JSONResponse(status_code=500, content={"error": str(e)})

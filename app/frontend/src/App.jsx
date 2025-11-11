@@ -86,6 +86,7 @@ function App() {
 
   // --- Hàm Tải Dữ Liệu ---
   const handleFetchList = useCallback(async () => {
+    setImagesList([]);
     setIsLoading(prev => ({ ...prev, list: true }));
     try {
       const data = await fetchList();
@@ -105,10 +106,10 @@ function App() {
   }, []); // Thêm mảng phụ thuộc rỗng nếu API_URL là hằng số
 
   // --- Tải dữ liệu lần đầu khi component mount ---
-  // Đã sửa: Đơn giản hóa logic, chỉ gọi handleFetchList
-  useEffect(() => {
-    handleFetchList();
-  }, [handleFetchList]);
+  // Đã sửa: Không tự động gọi handleFetchList khi load trang (chỉ fetch khi user gửi/upload)
+  // useEffect(() => {
+  //   handleFetchList();
+  // }, [handleFetchList]);
 
   // --- Xử lý sự kiện file input ---
   const handleFileChange = (e) => {
